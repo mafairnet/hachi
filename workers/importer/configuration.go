@@ -8,9 +8,9 @@ import (
 	"path/filepath"
 )
 
-//Configuration variables
+//Configuration The object that stores the configuration variables
 type Configuration struct {
-	IftServiceUrl string
+	IftServiceURL string
 	DbServer      string
 	DbUser        string
 	DbPassword    string
