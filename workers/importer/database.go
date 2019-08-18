@@ -1,18 +1,215 @@
 package main
 
-type grackleCall struct {
-	id       int
-	queue    int
-	server   int
-	number   string
-	date     string
-	status   int
-	uniqueid string
+import (
+	"database/sql"
+	"fmt"
+	"log"
+	"strconv"
+	"strings"
+)
+
+func cleanDB() {
+	db, err := sql.Open("mysql", configuration.DbUsername+":"+configuration.DbPassword+"@tcp("+configuration.DbServer+":"+configuration.DbPort+")/"+configuration.DbSchema)
+
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	defer db.Close()
+
+	sql := "call CleanDb"
+
+	stmt, err := db.Prepare(sql)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	res, err := stmt.Exec()
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	affect, err := res.RowsAffected()
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	fmt.Printf("SQL: %v, Result: %v\n", sql, affect)
+
 }
 
-func getUser() {
+//insertStatesIntoDb Insert States retreived from CSV file to Database
+func insertStatesIntoDb(states []string) {
+	for _, state := range states {
+		db, err := sql.Open("mysql", configuration.DbUsername+":"+configuration.DbPassword+"@tcp("+configuration.DbServer+":"+configuration.DbPort+")/"+configuration.DbSchema)
+
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		defer db.Close()
+
+		sql := "INSERT INTO `hachi`.`state` (`description`) VALUES ('" + state + "');"
+
+		stmt, err := db.Prepare(sql)
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		res, err := stmt.Exec()
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		affect, err := res.RowsAffected()
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		fmt.Printf("SQL: %v, Result: %v\n", sql, affect)
+	}
+}
+
+func getDbStates() []State {
+	var state = State{}
+	result := []State{}
+
+	db, err := sql.Open("mysql", configuration.DbUsername+":"+configuration.DbPassword+"@tcp("+configuration.DbServer+":"+configuration.DbPort+")/"+configuration.DbSchema)
+
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	defer db.Close()
+
+	rows, err := db.Query("SELECT id_state, description FROM state")
+
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	defer rows.Close()
+
+	for rows.Next() {
+		err := rows.Scan(&state.IDState, &state.Description)
+		if err != nil {
+			log.Fatal(err)
+		}
+		//log.Println(&cdrId, &calldate, &src, &dst)
+		//fmt.Println(strconv.Itoa(call.id) + "," +call.queue + "," +call.server + "," +call.number + "," +call.date + "," +call.status + "," +call.uniqueid)
+		result = append(result, State{state.IDState, state.Description})
+	}
+
+	err = rows.Err()
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	return result
+}
+
+//insertStatesIntoDb Insert States retreived from CSV file to Database
+func insertTownshipsIntoDb(townships []string, statesDb []State) {
+	var stateID int
+	db, err := sql.Open("mysql", configuration.DbUsername+":"+configuration.DbPassword+"@tcp("+configuration.DbServer+":"+configuration.DbPort+")/"+configuration.DbSchema)
+
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	defer db.Close()
+
+	sql := "INSERT INTO `hachi`.`township` (`description`, `id_state`) VALUES "
+
+	statesProcessed := 0
+
+	for _, township := range townships {
+
+		townshipState := strings.Split(township, "-")
+		stateID = 0
+		_ = stateID
+		for _, state := range statesDb {
+			if state.Description == townshipState[0] {
+				stateID = state.IDState
+			}
+		}
+
+		if stateID != 0 {
+			//fmt.Printf("Township: %v, State: %v, StateID: %v\n", townshipState[1], townshipState[0], stateID)
+			//INSERT INTO `hachi`.`township` (`description`, `id_state`) VALUES ('Test', '1');
+
+			stateIDStr := strconv.Itoa(stateID)
+
+			if statesProcessed > 0 {
+				sql = sql + ","
+			}
+
+			sql = sql + " ('" + townshipState[1] + "','" + stateIDStr + "')"
+
+			//_ = sql
+			statesProcessed++
+		}
+	}
+
+	if statesProcessed > 0 {
+
+		stmt, err := db.Prepare(sql)
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		res, err := stmt.Exec()
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		affect, err := res.RowsAffected()
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		fmt.Printf("SQL: %v, Result: %v\n", sql, affect)
+	}
 
 }
+
+/*func getDbTownships() []Township {
+	var township = Township{}
+	result := []Township{}
+
+	db, err := sql.Open("mysql", configuration.DbUsername+":"+configuration.DbPassword+"@tcp("+configuration.DbServer+":"+configuration.DbPort+")/"+configuration.DbSchema)
+
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	defer db.Close()
+
+	rows, err := db.Query("SELECT id_township, description, id_state FROM township")
+
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	defer rows.Close()
+
+	for rows.Next() {
+		err := rows.Scan(&township.IDState, &township.Description)
+		if err != nil {
+			log.Fatal(err)
+		}
+		//log.Println(&cdrId, &calldate, &src, &dst)
+		//fmt.Println(strconv.Itoa(call.id) + "," +call.queue + "," +call.server + "," +call.number + "," +call.date + "," +call.status + "," +call.uniqueid)
+		result = append(result, State{state.IDState, state.Description})
+	}
+
+	err = rows.Err()
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	return result
+}*/
 
 /*
 func getCalledNumbers() []grackleCall {

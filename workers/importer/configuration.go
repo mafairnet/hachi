@@ -12,8 +12,10 @@ import (
 type Configuration struct {
 	IftServiceURL string
 	DbServer      string
-	DbUser        string
+	DbUsername    string
 	DbPassword    string
+	DbPort        string
+	DbSchema      string
 }
 
 func getCurrentProgramLocation() string {

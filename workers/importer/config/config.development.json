@@ -1,6 +1,8 @@
 {
     "IftServiceURL" : "",
-    "DbServer" : "",
-    "DbUser" : "",
-    "DbPassword" : ""
+    "DbServer" : "localhost",
+    "DbUsername" : "root",
+    "DbPassword" : "r00t3d",
+    "DbPort" : "3306",
+    "DbSchema" : "hachi"
 }
