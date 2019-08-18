@@ -173,9 +173,9 @@ func insertTownshipsIntoDb(townships []string, statesDb []State) {
 
 }
 
-/*func getDbTownships() []Township {
-	var township = Township{}
-	result := []Township{}
+func getDbTownships() []TownshipDb {
+	var township = TownshipDb{}
+	result := []TownshipDb{}
 
 	db, err := sql.Open("mysql", configuration.DbUsername+":"+configuration.DbPassword+"@tcp("+configuration.DbServer+":"+configuration.DbPort+")/"+configuration.DbSchema)
 
@@ -194,13 +194,13 @@ func insertTownshipsIntoDb(townships []string, statesDb []State) {
 	defer rows.Close()
 
 	for rows.Next() {
-		err := rows.Scan(&township.IDState, &township.Description)
+		err := rows.Scan(&township.IDTownship, &township.Description, &township.IDState)
 		if err != nil {
 			log.Fatal(err)
 		}
 		//log.Println(&cdrId, &calldate, &src, &dst)
 		//fmt.Println(strconv.Itoa(call.id) + "," +call.queue + "," +call.server + "," +call.number + "," +call.date + "," +call.status + "," +call.uniqueid)
-		result = append(result, State{state.IDState, state.Description})
+		result = append(result, TownshipDb{township.IDTownship, township.Description, township.IDState})
 	}
 
 	err = rows.Err()
@@ -209,7 +209,7 @@ func insertTownshipsIntoDb(townships []string, statesDb []State) {
 	}
 
 	return result
-}*/
+}
 
 /*
 func getCalledNumbers() []grackleCall {

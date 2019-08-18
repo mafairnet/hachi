@@ -27,8 +27,8 @@ func main() {
 	sort.Strings(townships)
 	fmt.Printf("TownShips: %v\n", townships)
 	insertTownshipsIntoDb(townships, statesDb)
-	/*townshipsDb := getDbTownships()
-	fmt.Printf("TownShipsDB: %v\n", townshipsDb)*/
+	townshipsDb := getDbTownships()
+	fmt.Printf("TownShipsDB: %v\n", townshipsDb)
 
 	towns := fileImportTowns()
 	_ = towns
