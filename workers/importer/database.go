@@ -108,7 +108,7 @@ func getDbStates() []State {
 	return result
 }
 
-//insertStatesIntoDb Insert States retreived from CSV file to Database
+//insertTownshipsIntoDb Insert States retreived from CSV file to Database
 func insertTownshipsIntoDb(townships []string, statesDb []State) {
 	var stateID int
 	db, err := sql.Open("mysql", configuration.DbUsername+":"+configuration.DbPassword+"@tcp("+configuration.DbServer+":"+configuration.DbPort+")/"+configuration.DbSchema)
@@ -201,6 +201,122 @@ func getDbTownships() []TownshipDb {
 		//log.Println(&cdrId, &calldate, &src, &dst)
 		//fmt.Println(strconv.Itoa(call.id) + "," +call.queue + "," +call.server + "," +call.number + "," +call.date + "," +call.status + "," +call.uniqueid)
 		result = append(result, TownshipDb{township.IDTownship, township.Description, township.IDState})
+	}
+
+	err = rows.Err()
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	return result
+}
+
+//insertTownsIntoDb Insert States retreived from CSV file to Database
+func insertTownsIntoDb(towns []string, townshipsDb []TownshipDb, statesDb []State) {
+	var townshipID int
+
+	db, err := sql.Open("mysql", configuration.DbUsername+":"+configuration.DbPassword+"@tcp("+configuration.DbServer+":"+configuration.DbPort+")/"+configuration.DbSchema)
+
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	defer db.Close()
+
+	sql := "INSERT INTO `hachi`.`town` (`description`, `id_township`) VALUES "
+
+	townsProcessed := 0
+
+	for _, town := range towns {
+
+		townTownship := strings.Split(town, "-")
+
+		if townTownship[0] == "CANCUN" {
+			fmt.Printf("CANCUN\n")
+		}
+
+		townshipID = 0
+		_ = townshipID
+
+		for _, state := range statesDb {
+			_ = state
+
+			if townTownship[2] == state.Description {
+				for _, township := range townshipsDb {
+					if township.Description == townTownship[1] && township.IDState == state.IDState {
+						townshipID = township.IDTownship
+					}
+				}
+			}
+		}
+
+		if townshipID != 0 {
+			//fmt.Printf("Township: %v, State: %v, StateID: %v\n", townshipState[1], townshipState[0], stateID)
+			//INSERT INTO `hachi`.`township` (`description`, `id_state`) VALUES ('Test', '1');
+
+			townshipIDStr := strconv.Itoa(townshipID)
+
+			if townsProcessed > 0 {
+				sql = sql + ","
+			}
+
+			sql = sql + " ('" + townTownship[0] + "','" + townshipIDStr + "')"
+
+			//_ = sql
+			townsProcessed++
+		}
+	}
+
+	if townsProcessed > 0 {
+
+		stmt, err := db.Prepare(sql)
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		res, err := stmt.Exec()
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		affect, err := res.RowsAffected()
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		fmt.Printf("SQL: %v, Result: %v\n", sql, affect)
+	}
+
+}
+
+func getDbTowns() []TownDb {
+	var town = TownDb{}
+	result := []TownDb{}
+
+	db, err := sql.Open("mysql", configuration.DbUsername+":"+configuration.DbPassword+"@tcp("+configuration.DbServer+":"+configuration.DbPort+")/"+configuration.DbSchema)
+
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	defer db.Close()
+
+	rows, err := db.Query("SELECT id_town, description, id_township FROM town")
+
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	defer rows.Close()
+
+	for rows.Next() {
+		err := rows.Scan(&town.IDTown, &town.Description, &town.IDTownship)
+		if err != nil {
+			log.Fatal(err)
+		}
+		//log.Println(&cdrId, &calldate, &src, &dst)
+		//fmt.Println(strconv.Itoa(call.id) + "," +call.queue + "," +call.server + "," +call.number + "," +call.date + "," +call.status + "," +call.uniqueid)
+		result = append(result, TownDb{town.IDTown, town.Description, town.IDTownship})
 	}
 
 	err = rows.Err()

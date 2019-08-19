@@ -32,5 +32,9 @@ func main() {
 
 	towns := fileImportTowns()
 	_ = towns
-	//fmt.Printf("Towns: %v\n", towns)
+	sort.Strings(towns)
+	fmt.Printf("Towns: %v\n", towns)
+	insertTownsIntoDb(towns, townshipsDb, statesDb)
+	townsDb := getDbTowns()
+	fmt.Printf("TownsDB: %v\n", townsDb)
 }

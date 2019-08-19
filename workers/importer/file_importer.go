@@ -91,7 +91,7 @@ func fileImportTowns() []string {
 		//fmt.Printf("Line: %v\n", line2)
 		//Get All States, Remove Duplicates and Store in DB
 		if line[1] != " POBLACION" {
-			towns = append(towns, line[1])
+			towns = append(towns, line[1]+"-"+line[2]+"-"+line[3])
 		}
 	}
 	towns = removeDuplicatesSliceString(towns)
