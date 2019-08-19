@@ -97,3 +97,64 @@ func fileImportTowns() []string {
 	towns = removeDuplicatesSliceString(towns)
 	return towns
 }
+
+func fileImportProviders() []string {
+	var providers []string
+
+	csvFile, err := os.Open("pnn_Publico_15_08_2019.csv")
+
+	if err != nil {
+		log.Fatalln("Couldn't open the csv file", err)
+	}
+
+	reader := csv.NewReader(csvFile)
+
+	for {
+		line, error := reader.Read()
+
+		if error == io.EOF {
+			break
+		} else if error != nil {
+			log.Fatal(error)
+		}
+
+		//fmt.Printf("Line: %v\n", line2)
+		//Get All States, Remove Duplicates and Store in DB
+		if line[14] != " RAZON_SOCIAL" {
+			providers = append(providers, line[14])
+		}
+	}
+	providers = removeDuplicatesSliceString(providers)
+	return providers
+}
+
+func fileImportNumbers() []string {
+	var numbers []string
+
+	csvFile, err := os.Open("pnn_Publico_15_08_2019.csv")
+
+	if err != nil {
+		log.Fatalln("Couldn't open the csv file", err)
+	}
+
+	reader := csv.NewReader(csvFile)
+
+	for {
+		line, error := reader.Read()
+
+		if error == io.EOF {
+			break
+		} else if error != nil {
+			log.Fatal(error)
+		}
+
+		//fmt.Printf("Line: %v\n", line2)
+		//Get All States, Remove Duplicates and Store in DB
+		//6-7-8_9
+		if line[14] != " RAZON_SOCIAL" {
+			numbers = append(numbers, line[7]+"-"+line[8]+"-"+line[9]+"-"+line[10]+"-"+line[12]+"-"+line[1]+"-"+line[2]+"-"+line[3]+"-"+line[14])
+		}
+	}
+	numbers = removeDuplicatesSliceString(numbers)
+	return numbers
+}

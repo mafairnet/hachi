@@ -38,6 +38,143 @@ func cleanDB() {
 
 }
 
+func insertNumberTypesIntoDb() {
+
+	db, err := sql.Open("mysql", configuration.DbUsername+":"+configuration.DbPassword+"@tcp("+configuration.DbServer+":"+configuration.DbPort+")/"+configuration.DbSchema)
+
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	defer db.Close()
+
+	sql := "INSERT INTO `hachi`.`number_type` (`description`) VALUES ('FIJO'), ('MOVIL');"
+
+	stmt, err := db.Prepare(sql)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	res, err := stmt.Exec()
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	affect, err := res.RowsAffected()
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	fmt.Printf("SQL: %v, Result: %v\n", sql, affect)
+}
+
+func getDbNumberTypes() []NumberType {
+	var numberType = NumberType{}
+	result := []NumberType{}
+
+	db, err := sql.Open("mysql", configuration.DbUsername+":"+configuration.DbPassword+"@tcp("+configuration.DbServer+":"+configuration.DbPort+")/"+configuration.DbSchema)
+
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	defer db.Close()
+
+	rows, err := db.Query("SELECT id_number_type, description FROM number_type")
+
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	defer rows.Close()
+
+	for rows.Next() {
+		err := rows.Scan(&numberType.IDNumberType, &numberType.Description)
+		if err != nil {
+			log.Fatal(err)
+		}
+		//log.Println(&cdrId, &calldate, &src, &dst)
+		//fmt.Println(strconv.Itoa(call.id) + "," +call.queue + "," +call.server + "," +call.number + "," +call.date + "," +call.status + "," +call.uniqueid)
+		result = append(result, NumberType{numberType.IDNumberType, numberType.Description})
+	}
+
+	err = rows.Err()
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	return result
+}
+
+func insertProvidersIntoDb(providers []string) {
+	for _, provider := range providers {
+		db, err := sql.Open("mysql", configuration.DbUsername+":"+configuration.DbPassword+"@tcp("+configuration.DbServer+":"+configuration.DbPort+")/"+configuration.DbSchema)
+
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		defer db.Close()
+
+		sql := "INSERT INTO `hachi`.`provider` (`description`) VALUES ('" + provider + "');"
+
+		stmt, err := db.Prepare(sql)
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		res, err := stmt.Exec()
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		affect, err := res.RowsAffected()
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		fmt.Printf("SQL: %v, Result: %v\n", sql, affect)
+	}
+}
+
+func getDbProviders() []Provider {
+	var provider = Provider{}
+	result := []Provider{}
+
+	db, err := sql.Open("mysql", configuration.DbUsername+":"+configuration.DbPassword+"@tcp("+configuration.DbServer+":"+configuration.DbPort+")/"+configuration.DbSchema)
+
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	defer db.Close()
+
+	rows, err := db.Query("SELECT id_provider, description FROM provider")
+
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	defer rows.Close()
+
+	for rows.Next() {
+		err := rows.Scan(&provider.IDProvider, &provider.Description)
+		if err != nil {
+			log.Fatal(err)
+		}
+		//log.Println(&cdrId, &calldate, &src, &dst)
+		//fmt.Println(strconv.Itoa(call.id) + "," +call.queue + "," +call.server + "," +call.number + "," +call.date + "," +call.status + "," +call.uniqueid)
+		result = append(result, Provider{provider.IDProvider, provider.Description})
+	}
+
+	err = rows.Err()
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	return result
+}
+
 //insertStatesIntoDb Insert States retreived from CSV file to Database
 func insertStatesIntoDb(states []string) {
 	for _, state := range states {
@@ -328,13 +465,10 @@ func getDbTowns() []TownDb {
 }
 
 /*
-func getCalledNumbers() []grackleCall {
+func insertNumbersIntoDb(towns []string, townshipsDb []TownshipDb, statesDb []State, providers []Provider) {
+	var townshipID int
 
-	var call = grackleCall{}
-
-	result := []grackleCall{}
-
-	db, err := sql.Open("mysql", configuration.GrackleDbUsername+":"+configuration.GrackleDbPassword+"@tcp("+configuration.GrackleDbServer+":"+configuration.GrackleDbPort+")/"+configuration.GrackleDbSchema)
+	db, err := sql.Open("mysql", configuration.DbUsername+":"+configuration.DbPassword+"@tcp("+configuration.DbServer+":"+configuration.DbPort+")/"+configuration.DbSchema)
 
 	if err != nil {
 		log.Fatal(err)
@@ -342,84 +476,73 @@ func getCalledNumbers() []grackleCall {
 
 	defer db.Close()
 
-	rows, err := db.Query("SELECT id, queue, server, number, date, status, uniqueid FROM grackle.callback where status < 3")
+	sql := "INSERT INTO `hachi`.`town` (`description`, `id_township`) VALUES "
 
-	if err != nil {
-		log.Fatal(err)
+	townsProcessed := 0
+
+	for _, town := range towns {
+
+		townTownship := strings.Split(town, "-")
+
+		if townTownship[0] == "CANCUN" {
+			fmt.Printf("CANCUN\n")
+		}
+
+		townshipID = 0
+		_ = townshipID
+
+		for _, state := range statesDb {
+			_ = state
+
+			if townTownship[2] == state.Description {
+				for _, township := range townshipsDb {
+					if township.Description == townTownship[1] && township.IDState == state.IDState {
+						townshipID = township.IDTownship
+					}
+				}
+			}
+		}
+
+		if townshipID != 0 {
+			//fmt.Printf("Township: %v, State: %v, StateID: %v\n", townshipState[1], townshipState[0], stateID)
+			//INSERT INTO `hachi`.`township` (`description`, `id_state`) VALUES ('Test', '1');
+
+			townshipIDStr := strconv.Itoa(townshipID)
+
+			if townsProcessed > 0 {
+				sql = sql + ","
+			}
+
+			sql = sql + " ('" + townTownship[0] + "','" + townshipIDStr + "')"
+
+			//_ = sql
+			townsProcessed++
+		}
 	}
 
-	defer rows.Close()
+	if townsProcessed > 0 {
 
-	for rows.Next() {
-		err := rows.Scan(&call.id, &call.queue, &call.server, &call.number, &call.date, &call.status, &call.uniqueid)
+		stmt, err := db.Prepare(sql)
 		if err != nil {
 			log.Fatal(err)
 		}
-		//log.Println(&cdrId, &calldate, &src, &dst)
-		//fmt.Println(strconv.Itoa(call.id) + "," +call.queue + "," +call.server + "," +call.number + "," +call.date + "," +call.status + "," +call.uniqueid)
-		result = append(result, grackleCall{call.id, call.queue, call.server, call.number, call.date, call.status, call.uniqueid})
-	}
 
-	err = rows.Err()
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	return result
-}
-
-func getCallDetailRecord(calledNumber string, date string) []cdr {
-	var c = cdr{}
-
-	result := []cdr{}
-
-	layout := "2006-01-02 15:04:05"
-
-	originalDate, _ := time.Parse(layout, date)
-
-	fmt.Println("OldDate:" + originalDate.Format(layout))
-
-	newDate := originalDate.Add(time.Minute * 2)
-
-	fmt.Println("NewDate:" + newDate.Format(layout))
-
-	db, err := sql.Open("mysql", configuration.PbxDbUsername+":"+configuration.PbxDbPassword+"@tcp("+configuration.PbxDbServer+":"+configuration.PbxDbPort+")/"+configuration.PbxDbSchema)
-
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	defer db.Close()
-
-	sqlQuery := "SELECT cdrId, calldate,src, dst, disposition, billsec FROM asteriskcdrdb.cdr where calldate between '" + date + "' and '" + newDate.Format(layout) + "' and disposition = 'ANSWERED' and dcontext = 'from-internal-xfer'  and dst like '%" + calledNumber + "'"
-
-	//fmt.Println("SQL:" + sqlQuery)
-
-	rows, err := db.Query(sqlQuery)
-
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	defer rows.Close()
-
-	for rows.Next() {
-		err := rows.Scan(&c.cdrID, &c.calldate, &c.src, &c.dst, &c.disposition, &c.billsec)
+		res, err := stmt.Exec()
 		if err != nil {
 			log.Fatal(err)
 		}
-		//log.Println(&cdrId, &calldate, &src, &dst)
-		//fmt.Println(strconv.Itoa(c.cdrId) + "," + c.calldate + "," + c.src + "," + c.dst + "," + c.disposition)
-		result = append(result, cdr{c.cdrID, c.calldate, c.src, c.dst, c.disposition, c.billsec})
+
+		affect, err := res.RowsAffected()
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		fmt.Printf("SQL: %v, Result: %v\n", sql, affect)
 	}
 
-	err = rows.Err()
-	if err != nil {
-		log.Fatal(err)
-	}
-	return result
 }
 
+/*
 func updateGrackleRegistry(grackleCallID int, status int) {
 	db, err := sql.Open("mysql", configuration.GrackleDbUsername+":"+configuration.GrackleDbPassword+"@tcp("+configuration.GrackleDbServer+":"+configuration.GrackleDbPort+")/"+configuration.GrackleDbSchema)
 

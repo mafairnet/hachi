@@ -14,8 +14,20 @@ func main() {
 
 	cleanDB()
 
+	insertNumberTypesIntoDb()
+	numberTypes := getDbNumberTypes()
+	fmt.Printf("NumberTypes: %v\n", numberTypes)
+
+	providers := fileImportProviders()
+	_ = providers
+	sort.Strings(providers)
+	fmt.Printf("Providers: %v\n", providers)
+	insertProvidersIntoDb(providers)
+	providersDb := getDbProviders()
+	fmt.Printf("ProvidersDB: %v\n", providersDb)
+
 	states := fileImportStates()
-	//_ = states
+	_ = states
 	sort.Strings(states)
 	fmt.Printf("States: %v\n", states)
 	insertStatesIntoDb(states)
@@ -37,4 +49,9 @@ func main() {
 	insertTownsIntoDb(towns, townshipsDb, statesDb)
 	townsDb := getDbTowns()
 	fmt.Printf("TownsDB: %v\n", townsDb)
+
+	numbers := fileImportNumbers()
+	_ = numbers
+	sort.Strings(numbers)
+	fmt.Printf("Numbers: %v\n", numbers)
 }
