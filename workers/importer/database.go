@@ -368,10 +368,6 @@ func insertTownsIntoDb(towns []string, townshipsDb []TownshipDb, statesDb []Stat
 
 		townTownship := strings.Split(town, "-")
 
-		if townTownship[0] == "CANCUN" {
-			fmt.Printf("CANCUN\n")
-		}
-
 		townshipID = 0
 		_ = townshipID
 
@@ -464,9 +460,10 @@ func getDbTowns() []TownDb {
 	return result
 }
 
-/*
-func insertNumbersIntoDb(towns []string, townshipsDb []TownshipDb, statesDb []State, providers []Provider) {
-	var townshipID int
+func insertNumbersIntoDb(numbers []string, townsDb []TownDb, townshipsDb []TownshipDb, statesDb []State, providers []Provider) {
+	var townID int
+	var providerID int
+	var numberTypeID int
 
 	db, err := sql.Open("mysql", configuration.DbUsername+":"+configuration.DbPassword+"@tcp("+configuration.DbServer+":"+configuration.DbPort+")/"+configuration.DbSchema)
 
@@ -476,51 +473,73 @@ func insertNumbersIntoDb(towns []string, townshipsDb []TownshipDb, statesDb []St
 
 	defer db.Close()
 
-	sql := "INSERT INTO `hachi`.`town` (`description`, `id_township`) VALUES "
+	sql := "INSERT INTO `hachi`.`number` (`prefix`, `series`, `initial_numeration`, `final_numeration`, `id_provider`, `id_number`, `id_town`) VALUES "
 
-	townsProcessed := 0
+	numbersProcessed := 0
 
-	for _, town := range towns {
+	for _, number := range numbers {
 
-		townTownship := strings.Split(town, "-")
+		numberData := strings.Split(number, "-")
 
-		if townTownship[0] == "CANCUN" {
-			fmt.Printf("CANCUN\n")
-		}
-
-		townshipID = 0
-		_ = townshipID
+		townID = 0
+		_ = townID
 
 		for _, state := range statesDb {
 			_ = state
 
-			if townTownship[2] == state.Description {
+			if numberData[6] == state.Description {
+
 				for _, township := range townshipsDb {
-					if township.Description == townTownship[1] && township.IDState == state.IDState {
-						townshipID = township.IDTownship
+
+					if township.Description == numberData[5] && township.IDState == state.IDState {
+
+						for _, town := range townsDb {
+							if town.Description == numberData[4] && town.IDTownship == township.IDTownship {
+								townID = town.IDTown
+							}
+						}
 					}
 				}
 			}
 		}
 
-		if townshipID != 0 {
+		if townID != 0 {
 			//fmt.Printf("Township: %v, State: %v, StateID: %v\n", townshipState[1], townshipState[0], stateID)
 			//INSERT INTO `hachi`.`township` (`description`, `id_state`) VALUES ('Test', '1');
 
-			townshipIDStr := strconv.Itoa(townshipID)
+			providerID = 0
+			_ = providerID
 
-			if townsProcessed > 0 {
+			for _, provider := range providers {
+				if numberData[7] == provider.Description {
+					providerID = provider.IDProvider
+				}
+			}
+
+			if numberData[0] == "MOVIL" {
+				numberTypeID = 1
+			} else if numberData[0] == "FIJO" {
+				numberTypeID = 2
+			} else {
+				numberTypeID = 0
+			}
+
+			providerIDStr := strconv.Itoa(providerID)
+			townIDStr := strconv.Itoa(townID)
+			numberTypeIDStr := strconv.Itoa(numberTypeID)
+
+			if numbersProcessed > 0 {
 				sql = sql + ","
 			}
 
-			sql = sql + " ('" + townTownship[0] + "','" + townshipIDStr + "')"
+			sql = sql + " ('" + numberData[0] + "','" + numberData[1] + "','" + numberData[2] + "','" + numberData[3] + "','" + providerIDStr + "','" + numberTypeIDStr + "','" + townIDStr + "')"
 
 			//_ = sql
-			townsProcessed++
+			numbersProcessed++
 		}
 	}
 
-	if townsProcessed > 0 {
+	if numbersProcessed > 0 {
 
 		stmt, err := db.Prepare(sql)
 		if err != nil {
