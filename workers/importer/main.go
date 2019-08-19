@@ -54,4 +54,5 @@ func main() {
 	_ = numbers
 	sort.Strings(numbers)
 	fmt.Printf("Numbers: %v\n", numbers)
+	insertNumbersIntoDb(numbers, townsDb, townshipsDb, statesDb, providersDb)
 }

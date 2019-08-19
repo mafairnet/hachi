@@ -152,7 +152,7 @@ func fileImportNumbers() []string {
 		//Get All States, Remove Duplicates and Store in DB
 		//6-7-8_9
 		if line[14] != " RAZON_SOCIAL" {
-			numbers = append(numbers, line[7]+"-"+line[8]+"-"+line[9]+"-"+line[10]+"-"+line[12]+"-"+line[1]+"-"+line[2]+"-"+line[3]+"-"+line[14])
+			numbers = append(numbers, line[7]+"_"+line[8]+"_"+line[9]+"_"+line[10]+"_"+line[12]+"_"+line[1]+"_"+line[2]+"_"+line[3]+"_"+line[14])
 		}
 	}
 	numbers = removeDuplicatesSliceString(numbers)

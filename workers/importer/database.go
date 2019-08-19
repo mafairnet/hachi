@@ -464,6 +464,9 @@ func insertNumbersIntoDb(numbers []string, townsDb []TownDb, townshipsDb []Towns
 	var townID int
 	var providerID int
 	var numberTypeID int
+	var sqlString string
+	var numberData []string
+	var sqlValues string
 
 	db, err := sql.Open("mysql", configuration.DbUsername+":"+configuration.DbPassword+"@tcp("+configuration.DbServer+":"+configuration.DbPort+")/"+configuration.DbSchema)
 
@@ -473,13 +476,44 @@ func insertNumbersIntoDb(numbers []string, townsDb []TownDb, townshipsDb []Towns
 
 	defer db.Close()
 
-	sql := "INSERT INTO `hachi`.`number` (`prefix`, `series`, `initial_numeration`, `final_numeration`, `id_provider`, `id_number`, `id_town`) VALUES "
-
 	numbersProcessed := 0
+	lastPrefix := ""
 
 	for _, number := range numbers {
 
-		numberData := strings.Split(number, "-")
+		numberData = strings.Split(number, "_")
+
+		if lastPrefix != numberData[0] && lastPrefix != "" {
+			/*if lastPrefix != "226" {
+				fmt.Printf("PREFIX: %v\n", lastPrefix)
+			}*/
+
+			sqlInsert := "INSERT INTO `hachi`.`number` (`prefix`, `series`, `initial_numeration`, `final_numeration`, `id_provider`, `id_number_type`, `id_town`) VALUES "
+			sqlString = sqlInsert + sqlValues
+
+			fmt.Printf("SQL: %v\n", sqlString)
+
+			if sqlValues != ""{
+				stmt, err := db.Prepare(sqlString)
+				if err != nil {
+					log.Fatal(err)
+				}
+
+				res, err := stmt.Exec()
+				if err != nil {
+					log.Fatal(err)
+				}
+
+				affect, err := res.RowsAffected()
+				if err != nil {
+					log.Fatal(err)
+				}
+
+				fmt.Printf("SQL: %v, Result: %v\n", sqlString, affect)
+			}
+			numbersProcessed = 0
+			sqlValues = ""
+		}
 
 		townID = 0
 		_ = townID
@@ -487,14 +521,14 @@ func insertNumbersIntoDb(numbers []string, townsDb []TownDb, townshipsDb []Towns
 		for _, state := range statesDb {
 			_ = state
 
-			if numberData[6] == state.Description {
+			if numberData[7] == state.Description {
 
 				for _, township := range townshipsDb {
 
-					if township.Description == numberData[5] && township.IDState == state.IDState {
+					if township.Description == numberData[6] && township.IDState == state.IDState {
 
 						for _, town := range townsDb {
-							if town.Description == numberData[4] && town.IDTownship == township.IDTownship {
+							if town.Description == numberData[5] && town.IDTownship == township.IDTownship {
 								townID = town.IDTown
 							}
 						}
@@ -511,14 +545,14 @@ func insertNumbersIntoDb(numbers []string, townsDb []TownDb, townshipsDb []Towns
 			_ = providerID
 
 			for _, provider := range providers {
-				if numberData[7] == provider.Description {
+				if numberData[8] == provider.Description {
 					providerID = provider.IDProvider
 				}
 			}
 
-			if numberData[0] == "MOVIL" {
+			if numberData[4] == "MOVIL" {
 				numberTypeID = 1
-			} else if numberData[0] == "FIJO" {
+			} else if numberData[4] == "FIJO" {
 				numberTypeID = 2
 			} else {
 				numberTypeID = 0
@@ -529,35 +563,22 @@ func insertNumbersIntoDb(numbers []string, townsDb []TownDb, townshipsDb []Towns
 			numberTypeIDStr := strconv.Itoa(numberTypeID)
 
 			if numbersProcessed > 0 {
-				sql = sql + ","
+				sqlValues = sqlValues + ","
 			}
-
-			sql = sql + " ('" + numberData[0] + "','" + numberData[1] + "','" + numberData[2] + "','" + numberData[3] + "','" + providerIDStr + "','" + numberTypeIDStr + "','" + townIDStr + "')"
-
+			payload := " ('" + numberData[0] + "','" + numberData[1] + "','" + numberData[2] + "','" + numberData[3] + "','" + providerIDStr + "','" + numberTypeIDStr + "','" + townIDStr + "')"
+			sqlValues = sqlValues + payload
+			fmt.Printf("Data: %v\n", payload)
 			//_ = sql
 			numbersProcessed++
+
+			lastPrefix = numberData[0]
+
 		}
 	}
 
-	if numbersProcessed > 0 {
+	/*if numbersProcessed > 0 {
 
-		stmt, err := db.Prepare(sql)
-		if err != nil {
-			log.Fatal(err)
-		}
-
-		res, err := stmt.Exec()
-		if err != nil {
-			log.Fatal(err)
-		}
-
-		affect, err := res.RowsAffected()
-		if err != nil {
-			log.Fatal(err)
-		}
-
-		fmt.Printf("SQL: %v, Result: %v\n", sql, affect)
-	}
+	}*/
 
 }
 
