@@ -1,5 +1,5 @@
 {
-    "IftServiceURL" : "",
+    "IftCatalogURL" : "",
     "DbServer" : "localhost",
     "DbUsername" : "root",
     "DbPassword" : "r00t3d",

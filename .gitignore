@@ -21,3 +21,6 @@ $RECYCLE.BIN/
 # =========================
 # Operating System Files
 # =========================
+workers/importer/uncompressed/pnn_Publico_18_08_2019.csv
+workers/importer/downloads/pnn_Publico_18_08_2019.zip
+workers/importer/downloads/pnn_Publico_latest.zip

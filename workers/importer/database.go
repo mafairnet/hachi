@@ -493,7 +493,7 @@ func insertNumbersIntoDb(numbers []string, townsDb []TownDb, townshipsDb []Towns
 
 			fmt.Printf("SQL: %v\n", sqlString)
 
-			if sqlValues != ""{
+			if sqlValues != "" {
 				stmt, err := db.Prepare(sqlString)
 				if err != nil {
 					log.Fatal(err)
@@ -550,9 +550,9 @@ func insertNumbersIntoDb(numbers []string, townsDb []TownDb, townshipsDb []Towns
 				}
 			}
 
-			if numberData[4] == "MOVIL" {
+			if numberData[4] == "FIJO" {
 				numberTypeID = 1
-			} else if numberData[4] == "FIJO" {
+			} else if numberData[4] == "MOVIL" {
 				numberTypeID = 2
 			} else {
 				numberTypeID = 0

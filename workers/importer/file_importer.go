@@ -8,7 +8,7 @@ import (
 )
 
 func fileImportStates() []string {
-	csvFile, err := os.Open("pnn_Publico_15_08_2019.csv")
+	csvFile, err := os.Open("uncompressed/" + filename + ".csv")
 
 	if err != nil {
 		log.Fatalln("Couldn't open the csv file", err)
@@ -41,7 +41,7 @@ func fileImportStates() []string {
 func fileImportTownships() []string {
 	var townShips []string
 
-	csvFile, err := os.Open("pnn_Publico_15_08_2019.csv")
+	csvFile, err := os.Open("uncompressed/" + filename + ".csv")
 
 	if err != nil {
 		log.Fatalln("Couldn't open the csv file", err)
@@ -71,7 +71,7 @@ func fileImportTownships() []string {
 func fileImportTowns() []string {
 	var towns []string
 
-	csvFile, err := os.Open("pnn_Publico_15_08_2019.csv")
+	csvFile, err := os.Open("uncompressed/" + filename + ".csv")
 
 	if err != nil {
 		log.Fatalln("Couldn't open the csv file", err)
@@ -101,7 +101,7 @@ func fileImportTowns() []string {
 func fileImportProviders() []string {
 	var providers []string
 
-	csvFile, err := os.Open("pnn_Publico_15_08_2019.csv")
+	csvFile, err := os.Open("uncompressed/" + filename + ".csv")
 
 	if err != nil {
 		log.Fatalln("Couldn't open the csv file", err)
@@ -131,7 +131,7 @@ func fileImportProviders() []string {
 func fileImportNumbers() []string {
 	var numbers []string
 
-	csvFile, err := os.Open("pnn_Publico_15_08_2019.csv")
+	csvFile, err := os.Open("uncompressed/" + filename + ".csv")
 
 	if err != nil {
 		log.Fatalln("Couldn't open the csv file", err)

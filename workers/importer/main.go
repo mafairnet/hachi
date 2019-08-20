@@ -8,9 +8,26 @@ import (
 )
 
 var configuration = getProgramConfiguration()
+var filename string
 
 func main() {
 	fmt.Printf("Hachi isn initializing!\n")
+
+	filename = "pnn_Publico_18_08_2019"
+	/*
+		files, err := Unzip("downloads/"+filename+".zip", "uncompressed")
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		fmt.Println("Unzipped:\n" + strings.Join(files, "\n"))
+
+		//https://sns.ift.org.mx:8081/sns-frontend/planes-numeracion/descarga-publica.xhtml
+		fileUrl := "https://golangcode.com/images/avatar.jpg"
+
+		if err := DownloadFile("avatar.jpg", fileUrl); err != nil {
+			panic(err)
+		}*/
 
 	cleanDB()
 
@@ -55,4 +72,5 @@ func main() {
 	sort.Strings(numbers)
 	fmt.Printf("Numbers: %v\n", numbers)
 	insertNumbersIntoDb(numbers, townsDb, townshipsDb, statesDb, providersDb)
+
 }
