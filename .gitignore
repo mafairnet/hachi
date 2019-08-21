@@ -24,3 +24,5 @@ $RECYCLE.BIN/
 workers/importer/uncompressed/pnn_Publico_18_08_2019.csv
 workers/importer/downloads/pnn_Publico_18_08_2019.zip
 workers/importer/downloads/pnn_Publico_latest.zip
+workers/http_server/config/config.development.json
+workers/http_server/config/config.development.json
