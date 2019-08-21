@@ -1,5 +1,5 @@
 {
-    "IftCatalogURL" : "",
+    "IftCatalogURL" : "https://github.com/mafairnet/hachi/blob/master/ift/",
     "DbServer" : "localhost",
     "DbUsername" : "root",
     "DbPassword" : "r00t3d",

@@ -477,6 +477,7 @@ func insertNumbersIntoDb(numbers []string, townsDb []TownDb, townshipsDb []Towns
 	defer db.Close()
 
 	numbersProcessed := 0
+	totalNumbersProcessed := 0
 	lastPrefix := ""
 
 	for _, number := range numbers {
@@ -484,9 +485,6 @@ func insertNumbersIntoDb(numbers []string, townsDb []TownDb, townshipsDb []Towns
 		numberData = strings.Split(number, "_")
 
 		if lastPrefix != numberData[0] && lastPrefix != "" {
-			/*if lastPrefix != "226" {
-				fmt.Printf("PREFIX: %v\n", lastPrefix)
-			}*/
 
 			sqlInsert := "INSERT INTO `hachi`.`number` (`prefix`, `series`, `initial_numeration`, `final_numeration`, `id_provider`, `id_number_type`, `id_town`) VALUES "
 			sqlString = sqlInsert + sqlValues
@@ -573,13 +571,39 @@ func insertNumbersIntoDb(numbers []string, townsDb []TownDb, townshipsDb []Towns
 
 			lastPrefix = numberData[0]
 
+			if totalNumbersProcessed == len(numbers)-1 {
+
+				sqlInsert := "INSERT INTO `hachi`.`number` (`prefix`, `series`, `initial_numeration`, `final_numeration`, `id_provider`, `id_number_type`, `id_town`) VALUES "
+				sqlString = sqlInsert + sqlValues
+
+				fmt.Printf("SQL: %v\n", sqlString)
+
+				if sqlValues != "" {
+					stmt, err := db.Prepare(sqlString)
+					if err != nil {
+						log.Fatal(err)
+					}
+
+					res, err := stmt.Exec()
+					if err != nil {
+						log.Fatal(err)
+					}
+
+					affect, err := res.RowsAffected()
+					if err != nil {
+						log.Fatal(err)
+					}
+
+					fmt.Printf("SQL: %v, Result: %v\n", sqlString, affect)
+				}
+				numbersProcessed = 0
+				sqlValues = ""
+			}
+
 		}
+		totalNumbersProcessed++
 	}
-
-	/*if numbersProcessed > 0 {
-
-	}*/
-
+	fmt.Printf("Numbers processed: %v\n", totalNumbersProcessed)
 }
 
 /*

@@ -2,7 +2,9 @@ package main
 
 import (
 	"fmt"
+	"log"
 	"sort"
+	"strings"
 
 	_ "github.com/go-sql-driver/mysql"
 )
@@ -13,21 +15,32 @@ var filename string
 func main() {
 	fmt.Printf("Hachi isn initializing!\n")
 
-	filename = "pnn_Publico_18_08_2019"
-	/*
-		files, err := Unzip("downloads/"+filename+".zip", "uncompressed")
-		if err != nil {
-			log.Fatal(err)
-		}
+	filename = "pnn_Publico_latest"
 
-		fmt.Println("Unzipped:\n" + strings.Join(files, "\n"))
+	fileUrl := configuration.IftCatalogURL + filename + ".zip?raw=true"
 
-		//https://sns.ift.org.mx:8081/sns-frontend/planes-numeracion/descarga-publica.xhtml
-		fileUrl := "https://golangcode.com/images/avatar.jpg"
+	fmt.Printf("Downloading: %v\n", fileUrl)
 
-		if err := DownloadFile("avatar.jpg", fileUrl); err != nil {
-			panic(err)
-		}*/
+	if err := DownloadFile("downloads/"+filename+".zip", fileUrl); err != nil {
+		panic(err)
+	}
+
+	fmt.Println("Downloaded!")
+
+	fmt.Printf("Unziping file...\n")
+
+	files, err := Unzip("downloads/"+filename+".zip", "uncompressed")
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	filenameTemp := strings.Join(files, "")
+
+	newFilename := strings.Split(filenameTemp, "\\")
+
+	filename = newFilename[1]
+
+	modifyFileToProcess("uncompressed/" + filename)
 
 	cleanDB()
 

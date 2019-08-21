@@ -10,7 +10,7 @@ import (
 
 //Configuration The object that stores the configuration variables
 type Configuration struct {
-	IftServiceURL string
+	IftCatalogURL string
 	DbServer      string
 	DbUsername    string
 	DbPassword    string
