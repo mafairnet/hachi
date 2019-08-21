@@ -69,6 +69,146 @@ func getDbNumber(prefix string, series string, numeration string) NumberDb {
 	}
 }
 
+func getDbState(idState int) State {
+
+	var state = State{}
+	result := State{}
+
+	db, err := sql.Open("mysql", configuration.DbUsername+":"+configuration.DbPassword+"@tcp("+configuration.DbServer+":"+configuration.DbPort+")/"+configuration.DbSchema)
+
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	defer db.Close()
+
+	row := db.QueryRow("SELECT * FROM state where id_state=?", idState)
+
+	error := row.Scan(&state.IDState, &state.Description)
+
+	switch error {
+	case sql.ErrNoRows:
+		fmt.Println("No rows were returned!")
+		return result
+	case nil:
+		return state
+	default:
+		panic(error)
+	}
+}
+
+func getDbTownship(idTown int) TownshipDb {
+
+	var township = TownshipDb{}
+	result := TownshipDb{}
+
+	db, err := sql.Open("mysql", configuration.DbUsername+":"+configuration.DbPassword+"@tcp("+configuration.DbServer+":"+configuration.DbPort+")/"+configuration.DbSchema)
+
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	defer db.Close()
+
+	row := db.QueryRow("SELECT * FROM township where id_township=?", idTown)
+
+	error := row.Scan(&township.IDTownship, &township.Description, &township.IDState)
+
+	switch error {
+	case sql.ErrNoRows:
+		fmt.Println("No rows were returned!")
+		return result
+	case nil:
+		return township
+	default:
+		panic(error)
+	}
+}
+
+func getDbTown(idTown int) TownDb {
+
+	var town = TownDb{}
+	result := TownDb{}
+
+	db, err := sql.Open("mysql", configuration.DbUsername+":"+configuration.DbPassword+"@tcp("+configuration.DbServer+":"+configuration.DbPort+")/"+configuration.DbSchema)
+
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	defer db.Close()
+
+	row := db.QueryRow("SELECT * FROM town where id_town=?", idTown)
+
+	error := row.Scan(&town.IDTown, &town.Description, &town.IDTownship)
+
+	switch error {
+	case sql.ErrNoRows:
+		fmt.Println("No rows were returned!")
+		return result
+	case nil:
+		return town
+	default:
+		panic(error)
+	}
+}
+
+func getDbProvider(idProvider int) Provider {
+
+	var provider = Provider{}
+	result := Provider{}
+
+	db, err := sql.Open("mysql", configuration.DbUsername+":"+configuration.DbPassword+"@tcp("+configuration.DbServer+":"+configuration.DbPort+")/"+configuration.DbSchema)
+
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	defer db.Close()
+
+	row := db.QueryRow("SELECT * FROM provider where id_provider=?", idProvider)
+
+	error := row.Scan(&provider.IDProvider, &provider.Description)
+
+	switch error {
+	case sql.ErrNoRows:
+		fmt.Println("No rows were returned!")
+		return result
+	case nil:
+		return provider
+	default:
+		panic(error)
+	}
+}
+
+func getDbNumberType(idNumberType int) NumberType {
+
+	var numberType = NumberType{}
+	result := NumberType{}
+
+	db, err := sql.Open("mysql", configuration.DbUsername+":"+configuration.DbPassword+"@tcp("+configuration.DbServer+":"+configuration.DbPort+")/"+configuration.DbSchema)
+
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	defer db.Close()
+
+	row := db.QueryRow("SELECT * FROM number_type where id_number_type=?", idNumberType)
+
+	error := row.Scan(&numberType.IDNumberType, &numberType.Description)
+
+	switch error {
+	case sql.ErrNoRows:
+		fmt.Println("No rows were returned!")
+		return result
+	case nil:
+		return numberType
+	default:
+		panic(error)
+	}
+}
+
 func getDbNumbers() []NumberDb {
 	var number = NumberDb{}
 	result := []NumberDb{}
