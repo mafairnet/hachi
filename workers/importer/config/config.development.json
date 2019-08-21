@@ -1,8 +1,8 @@
 {
     "IftCatalogURL" : "https://github.com/mafairnet/hachi/blob/master/ift/",
-    "DbServer" : "localhost",
-    "DbUsername" : "root",
-    "DbPassword" : "r00t3d",
+    "DbServer" : "YOUR_SERVER_IP",
+    "DbUsername" : "YOUR_DB_USERNAME",
+    "DbPassword" : "YOUR_DB_PASSWORD",
     "DbPort" : "3306",
     "DbSchema" : "hachi"
 }

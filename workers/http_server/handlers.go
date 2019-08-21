@@ -31,8 +31,9 @@ func NumberShow(w http.ResponseWriter, r *http.Request) {
 		panic(err)
 	}*/
 	numberId = vars["numberId"]
-	number := RepoFindNumber(numberId)
-	if number.IDNumber > 0 {
+
+	if len(numberId) >= 10 {
+		number := RepoFindNumber(numberId)
 		w.Header().Set("Content-Type", "application/json; charset=UTF-8")
 		w.WriteHeader(http.StatusOK)
 		if err := json.NewEncoder(w).Encode(number); err != nil {

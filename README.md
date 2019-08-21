@@ -31,16 +31,107 @@ Compilation
 1. Install golang (further info about that at https://golang.org/doc/install)
 2. Install golang dependencies
 ```
-go get- u"github.com/go-sql-driver/mysql"
+go get- u "github.com/go-sql-driver/mysql"
 ```
 3. Build binaries
 ```
 go build
 ```
-4. Run your binary
+4. Edit the "config/config.development.json". Set the mysql/mariadb server IP, username and password.
+```
+{
+    "IftCatalogURL" : "https://github.com/mafairnet/hachi/blob/master/ift/",
+    "DbServer" : "YOUR_SERVER_IP",
+    "DbUsername" : "YOUR_DB_USERNAME",
+    "DbPassword" : "YOUR_DB_PASSWORD",
+    "DbPort" : "3306",
+    "DbSchema" : "hachi"
+}
+```
+5. Run your binary
 ```
 //Windows
 .\importer.exe
 //Linux/MacOS
 ./importer
+```
+
+API - HTTP Server
+-----------
+<!---
+![Importer](http://www.maf.mx/astricon/2017/images/spectrogram_peaks.png)
+-->
+
+The API HTTP Server is a Golang based program. It retreives the data of the 10 digit Mexican number from the relational mysql/mariadb database that was previously populated by your importer.
+
+It returns a json object containing the prefix, series, initial numeration, final numeration, type, provider, town, township and state where the phone number belongs.
+
+Prerequisites
+-----------
+- Golang Enviroment and dependencies
+- MySQL Server (5.1 or later)
+- Windows, MacOS or Linux SO
+
+Compilation
+-----------
+1. Install golang (further info about that at https://golang.org/doc/install)
+2. Install golang dependencies
+```
+go get- u "github.com/go-sql-driver/mysql"
+go get- u "github.com/gorilla/mux"
+```
+3. Build binaries
+```
+go build
+```
+4. Edit the "config/config.development.json". Set the mysql/mariadb server IP, username and password.
+```
+{
+    "DbServer" : "YOUR_SERVER_IP",
+    "DbUsername" : "YOUR_DB_USERNAME",
+    "DbPassword" : "YOUR_DB_PASSWORD",
+    "DbPort" : "3306",
+    "DbSchema" : "hachi"
+}
+```
+5. Run your binary
+```
+//Windows
+.\http_server.exe
+//Linux/MacOS
+./http_server
+```
+6. Request data through the API endpoint
+```
+http://SERVER_IP:8080/number/10_DIGIT_NUMBER
+``` 
+The endpoint will return a JSON data
+```
+{
+  "id_number": 102930,
+  "prefix": 998,
+  "series": 123,
+  "initial_numeration": 0,
+  "final_numeration": 9999,
+  "provider": {
+    "id_provider": 58,
+    "description": "RADIOMOVIL DIPSA, S.A. DE C.V."
+  },
+  "number_type": {
+    "id_number_type": 2,
+    "description": "MOVIL"
+  },
+  "town": {
+    "id_town": 824,
+    "description": "CANCUN",
+    "township": {
+      "id_township": 1456,
+      "description": "BENITO JUAREZ",
+      "state": {
+        "id_state": 23,
+        "description": "QROO"
+      }
+    }
+  }
+}
 ```
