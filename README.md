@@ -2,7 +2,13 @@ HACHI
 ===================
 Open Catalog & API for Mexican 10 Digit Public Numbers
 
+<p align="center">
+  <img width="400px" src="https://raw.githubusercontent.com/mafairnet/hachi/master/resources/hachi_logo.png">
+</p>
+
+<!---
 ![Hachi](https://raw.githubusercontent.com/mafairnet/hachi/master/resources/hachi_logo.png)
+-->
 
 About
 -----------
