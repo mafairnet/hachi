@@ -54,6 +54,29 @@ go build
     "DbSchema" : "hachi"
 }
 ```
+5. Create the database from the file "database/model.sql"
+```
+>mysql -u root -p 
+>create database hachi;
+>exit
+>mysql -u username -p hachi < database/model.sql
+```
+6. Add this Store Procedure
+```
+DELIMITER //
+ CREATE PROCEDURE CleanDb()
+   BEGIN
+   SET FOREIGN_KEY_CHECKS = 0;
+   truncate table state;
+   truncate table township;
+   truncate table town;
+   truncate table provider;
+   truncate table number_type;
+   truncate table number;
+   SET FOREIGN_KEY_CHECKS = 1;
+   END //
+DELIMITER ;
+```
 5. Run your binary
 ```
 //Windows
