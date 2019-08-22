@@ -21,7 +21,7 @@ System Architecture
 The project includes an importer tool to download the data to your computer/server the store into a relational DB and a HTTP Server that runs the API that provides the data of the 10 digit mexican numbers.
 
 <p align="center">
-  <img width="400px" src="https://raw.githubusercontent.com/mafairnet/hachi/master/resources/system_architecture.png">
+  <img width="700px" src="https://raw.githubusercontent.com/mafairnet/hachi/master/resources/system_architecture.png">
 </p>
 
 Importer
